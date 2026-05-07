@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>給EE的 Cowork 上手教學</title>
+<style>
+  :root {
+    --bg: #faf8f5;
+    --paper: #ffffff;
+    --ink: #2d2a26;
+    --ink-soft: #5b5751;
+    --ink-mute: #8a857d;
+    --accent: #d97757;
+    --accent-soft: #f5e4d8;
+    --accent-deep: #b85a3a;
+    --line: #e8e3dc;
+    --line-soft: #f0ebe3;
+    --good: #4a7c59;
+    --good-soft: #e1eee4;
+    --warn: #c89635;
+    --warn-soft: #faf2dd;
+    --info: #5b7c99;
+    --info-soft: #e3edf4;
+    --shadow: 0 1px 2px rgba(45,42,38,0.04), 0 4px 16px rgba(45,42,38,0.06);
+
+    /* Dark UI mockup palette (matches Claude desktop dark theme) */
+    --d-bg: #1a1a1a;
+    --d-bg2: #232323;
+    --d-line: #333;
+    --d-text: #e8e3dc;
+    --d-text-mute: #888;
+    --d-accent: #d97757;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Helvetica Neue", "Microsoft JhengHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 0;
+  }
+  nav.sidebar {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 20px 32px 28px;
+    border-right: 1px solid var(--line);
+    background: var(--paper);
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+  }
+  .brand-sub {
+    color: var(--ink-mute);
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+  nav ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: nav;
+  }
+  nav ol li {
+    counter-increment: nav;
+    margin: 4px 0;
+  }
+  nav ol li a {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 1.4;
+    transition: background 0.15s, color 0.15s;
+  }
+  nav ol li a::before {
+    content: counter(nav);
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--line-soft);
+    color: var(--ink-mute);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  nav ol li a:hover {
+    background: var(--line-soft);
+    color: var(--ink);
+  }
+  nav ol li a.done::before {
+    background: var(--good);
+    color: white;
+    content: "✓";
+  }
+  .nav-progress {
+    margin-top: 24px;
+    padding: 14px;
+    background: var(--accent-soft);
+    border-radius: 10px;
+  }
+  .nav-progress-label {
+    font-size: 12px;
+    color: var(--accent-deep);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .progress-bar {
+    height: 6px;
+    background: white;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .reset-btn {
+    margin-top: 10px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent-deep);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .reset-btn:hover { background: white; }
+
+  main {
+    padding: 56px 56px 120px 56px;
+    max-width: 800px;
+  }
+  .hero {
+    margin-bottom: 56px;
+  }
+  .hero h1 {
+    font-size: 38px;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .hero .subtitle {
+    color: var(--ink-soft);
+    font-size: 18px;
+    margin-bottom: 24px;
+  }
+  .hero-card {
+    background: linear-gradient(135deg, #f5e4d8 0%, #fce8db 100%);
+    padding: 24px 28px;
+    border-radius: 14px;
+    color: var(--ink);
+    font-size: 15px;
+  }
+  .hero-card strong { color: var(--accent-deep); }
+
+  section.chapter {
+    margin-top: 72px;
+    scroll-margin-top: 24px;
+  }
+  .chapter-tag {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent-deep);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .chapter-tag.special {
+    background: linear-gradient(135deg, #d97757, #b85a3a);
+    color: white;
+  }
+  .chapter h2 {
+    font-size: 28px;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .chapter-intro {
+    color: var(--ink-soft);
+    font-size: 16px;
+    margin-bottom: 32px;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 20px;
+    margin-bottom: 32px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--line);
+    color: var(--ink-soft);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .step-num:hover {
+    border-color: var(--accent);
+    color: var(--accent-deep);
+  }
+  .step.checked .step-num {
+    background: var(--good);
+    border-color: var(--good);
+    color: white;
+  }
+  .step.checked .step-num::after { content: "✓"; }
+  .step.checked .step-num span { display: none; }
+  .step-body h3 {
+    margin: 4px 0 6px 0;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .step-body p {
+    margin: 0 0 8px 0;
+    color: var(--ink-soft);
+  }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  .box {
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin: 12px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    border-left: 3px solid;
+  }
+  .box-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .box.tip { background: var(--info-soft); border-color: var(--info); }
+  .box.tip .box-title { color: var(--info); }
+  .box.warn { background: var(--warn-soft); border-color: var(--warn); }
+  .box.warn .box-title { color: var(--warn); }
+  .box.good { background: var(--good-soft); border-color: var(--good); }
+  .box.good .box-title { color: var(--good); }
+
+  .url {
+    display: inline-block;
+    background: var(--ink);
+    color: #f5e4d8;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+  }
+  .kbd {
+    display: inline-block;
+    background: var(--line-soft);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* Dark Mac window mockup (matches Claude desktop) */
+  .mac-window {
+    background: var(--d-bg);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    margin: 16px 0;
+    overflow: hidden;
+    border: 1px solid var(--d-line);
+    color: var(--d-text);
+  }
+  .mac-titlebar {
+    background: var(--d-bg2);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px solid var(--d-line);
+  }
+  .mac-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .mac-dot.r { background: #ff5f57; }
+  .mac-dot.y { background: #febc2e; }
+  .mac-dot.g { background: #28c840; }
+  .mac-titlebar-text {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: var(--d-text-mute);
+    font-weight: 500;
+  }
+  .mac-body {
+    padding: 14px;
+    font-size: 13px;
+    color: var(--d-text-mute);
+  }
+
+  /* Mode tabs (Chat / Cowork / Code) mockup */
+  .mode-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--d-bg2);
+    border-radius: 8px;
+    padding: 4px;
+    width: fit-content;
+    margin: 0 auto;
+  }
+  .mode-tab {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--d-text-mute);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mode-tab.active {
+    background: #3a3a3a;
+    color: var(--d-text);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .mode-tab.highlight {
+    background: var(--d-accent);
+    color: white;
+  }
+
+  /* Cowork sidebar mockup */
+  .cw-mock {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: 320px;
+  }
+  .cw-side {
+    background: #181818;
+    padding: 12px 8px;
+    border-right: 1px solid var(--d-line);
+    font-size: 11px;
+  }
+  .cw-side-item {
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--d-text-mute);
+    margin: 1px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cw-side-item.active {
+    background: #2a2a2a;
+    color: var(--d-text);
+  }
+  .cw-side-item.highlight {
+    background: rgba(217, 119, 87, 0.2);
+    color: var(--d-accent);
+    border: 1px dashed var(--d-accent);
+  }
+  .cw-side-section {
+    color: #555;
+    font-size: 10px;
+    padding: 12px 10px 4px 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .cw-main {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .cw-input-bar {
+    background: #2a2a2a;
+    border: 1px solid var(--d-line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--d-text-mute);
+  }
+  .cw-pill {
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: #1a1a1a;
+    color: var(--d-text-mute);
+    font-size: 10px;
+  }
+  .cw-pill.queue {
+    background: var(--d-accent);
+    color: white;
+  }
+  .annot {
+    font-size: 12px;
+    color: var(--accent-deep);
+    margin-top: 6px;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .demos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .demo-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .demo-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .demo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent-soft);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  .demo-card h4 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .demo-card p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .demo-quote {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--line-soft);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--ink);
+    font-style: italic;
+    display: none;
+  }
+  .demo-card.open .demo-quote { display: block; }
+  .demo-quote::before { content: "👉 試試看跟她說："; font-style: normal; color: var(--ink-mute); display: block; margin-bottom: 4px; font-size: 11px; letter-spacing: 0.04em; }
+
+  details.faq {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+  }
+  details.faq[open] {
+    border-color: var(--accent);
+  }
+  details.faq summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq summary::after {
+    content: "+";
+    font-size: 22px;
+    color: var(--ink-mute);
+    transition: transform 0.2s;
+  }
+  details.faq[open] summary::after { content: "−"; }
+  details.faq p {
+    margin: 12px 0 0 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  .chip-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+  .chip {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    border-radius: 24px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .chip strong { color: var(--ink); }
+
+  .footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-mute);
+    font-size: 14px;
+    text-align: center;
+  }
+  .footer .heart { color: var(--accent); }
+
+  pre.tree {
+    background: var(--ink);
+    color: #f5e4d8;
+    padding: 18px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 12px 0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.sidebar {
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+    }
+    main { padding: 32px 24px 80px 24px; }
+    .demos { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<nav class="sidebar">
+  <div class="brand"><span class="brand-dot"></span>給EE的教學</div>
+  <div class="brand-sub">Cowork 安裝與使用指南</div>
+  <ol id="nav-list">
+    <li><a href="#intro">先認識 Cowork 是什麼</a></li>
+    <li><a href="#pricing">付費方案怎麼選</a></li>
+    <li><a href="#download">下載並安裝 Claude</a></li>
+    <li><a href="#login">登入與三個模式</a></li>
+    <li><a href="#project">建立你的第一個 Project</a></li>
+    <li><a href="#first-task">第一個任務：購物清單</a></li>
+    <li><a href="#connectors">連接 Gmail、日曆等工具</a></li>
+    <li><a href="#more-demos">更多可以叫她做的事</a></li>
+    <li><a href="#personal-db">✨ 專為你設計：私人資料庫</a></li>
+    <li><a href="#faq">常見問題</a></li>
+  </ol>
+  <div class="nav-progress">
+    <div class="nav-progress-label">學習進度</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <button class="reset-btn" onclick="resetProgress()">重設進度</button>
+  </div>
+</nav>
+
+<main>
+
+<header class="hero">
+  <h1>嗨，EE 👋<br/>來認識 Cowork</h1>
+  <div class="subtitle">這份教學會帶你一步一步：從下載 app、登入、建立 Project，到讓 Claude 變成你的私人資料庫和提案產生器。</div>
+  <div class="hero-card">
+    <strong>Cowork 是什麼？</strong>
+    它是 Claude 桌面 app 上的三個模式之一（Chat / <strong>Cowork</strong> / Code）。Cowork 模式可以讀寫你電腦裡的檔案、操作 app、上網查資料、產出 Word / Excel / PPT，可以把它想成一個會操作電腦的智慧助理。
+    <br/><br/>
+    <strong>跟 ChatGPT / Claude 網頁版差在哪？</strong>
+    網頁版只能在對話框裡聊天；Cowork 模式直接在你的電腦資料夾裡幫你做事，產出實體檔案。
+    <br/><br/>
+    <strong>它怎麼組織工作？</strong>
+    用「Project」。每個 Project 對應一個你電腦上的資料夾。你可以建多個 Project（例如「事業資料庫」「家庭事務」「旅遊規劃」），它們各自獨立、互不干擾。
+    <br/><br/>
+    每完成一步就點旁邊的圓圈打勾 ✓，進度會自動存起來。
+  </div>
+</header>
+
+<!-- 1. Intro -->
+<section class="chapter" id="intro">
+  <div class="chapter-tag">Step 1 / 10</div>
+  <h2>先認識 Cowork 是什麼</h2>
+  <p class="chapter-intro">在開始安裝之前，先花 30 秒看一下它跟你以前用過的東西差在哪。</p>
+
+  <div class="step" data-step="intro-1">
+    <div class="step-num"><span>1</span></div>
+    <div class="step-body">
+      <h3>它是一個「會操作你電腦」的助理</h3>
+      <p>跟 ChatGPT 不同，Cowork 不只是回答你問題，它可以：</p>
+      <div class="chip-row">
+        <span class="chip">📝 <strong>幫你寫</strong> Word / Excel / PPT</span>
+        <span class="chip">🗂️ <strong>整理</strong>桌面或資料夾</span>
+        <span class="chip">📧 <strong>幫你看</strong> Gmail</span>
+        <span class="chip">📅 <strong>排</strong> Google Calendar</span>
+        <span class="chip">🌐 <strong>上網</strong>查資料</span>
+        <span class="chip">📊 <strong>做圖表</strong>跟報告</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="intro-2">
+    <div class="step-num"><span>2</span></div>
+    <div class="step-body">
+      <h3>所有事情都用「中文跟它講」就好</h3>
+      <p>不需要打程式、不需要學任何指令。就像跟一個人溝通一樣，例如：「幫我把桌面上有 2026 字樣的檔案，全部移到一個叫做『2026』的新資料夾」就可以了。</p>
+    </div>
+  </div>
+
+  <div class="box tip">
+    <div class="box-title">💡 小提醒</div>
+    EE不用記任何技術名詞。整份教學唯一需要做的就是：跟著步驟做、有問題就直接問 Claude。Claude 會用中文回答你。
+  </div>
+</section>
+
+<!-- 2. Pricing -->
+<section class="chapter" id="pricing">
+  <div class="chapter-tag">Step 2 / 10</div>
+  <h2>付費方案怎麼選</h2>
+  <p class="chapter-intro">先講錢的事，免得你裝完才發現要付費。</p>
+
+  <div class="step" data-step="pr-1">
+    <div class="step-num"><span>1</span></div>
+    <div class="step-body">
+      <h3>Cowork 模式需要付費帳號</h3>
+      <p>免費帳號可以用 Claude 做一般聊天，但 <strong>Cowork 模式</strong>（會操作你電腦那塊）需要 Pro 以上的方案才能用。三個常見方案：</p>
+
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0;">
+        <div style="border:2px solid var(--accent); border-radius:12px; padding:18px 14px; background:var(--accent-soft);">
+          <div style="font-size:11px; color:var(--accent-deep); font-weight:700; letter-spacing:0.05em;">推薦給你</div>
+          <div style="font-size:20px; font-weight:700; margin:4px 0;">Pro</div>
+          <div style="font-size:22px; color:var(--accent-deep); font-weight:700;">$20<span style="font-size:13px; font-weight:400;">/月</span></div>
+          <div style="font-size:12px; color:var(--ink-soft); margin-top:8px; line-height:1.5;">完整 Cowork 功能，每天的使用額度對一般用戶夠用。</div>
+        </div>
+        <div style="border:1px solid var(--line); border-radius:12px; padding:18px 14px;">
+          <div style="font-size:11px; color:var(--ink-mute); font-weight:600;">重度使用</div>
+          <div style="font-size:20px; font-weight:700; margin:4px 0;">Max</div>
+          <div style="font-size:22px; color:var(--ink); font-weight:700;">$100<span style="font-size:13px; font-weight:400;">/月</span></div>
+          <div style="font-size:12px; color:var(--ink-soft); margin-top:8px; line-height:1.5;">每天用很多、跑大型分析、做很多檔案才需要。</div>
+        </div>
+        <div style="border:1px solid var(--line); border-radius:12px; padding:18px 14px;">
+          <div style="font-size:11px; color:var(--ink-mute); font-weight:600;">免費試用</div>
+          <div style="font-size:20px; font-weight:700; margin:4px 0;">Free</div>
+          <div style="font-size:22px; color:var(--ink); font-weight:700;">$0</div>
+          <div style="font-size:12px; color:var(--ink-soft); margin-top:8px; line-height:1.5;">只能用一般聊天，<strong>沒有</strong> Cowork。先試看看 AI 對話的感覺可以。</div>
+        </div>
+      </div>
+
+      <div class="box tip">
+        <div class="box-title">💡 建議</div>
+        <strong>先選 Pro $20。</strong>這個方案對你說的「資料系統化、寫提案、當私人資料庫」這類用途已經很夠。如果一兩個月後發現天天用、額度不夠再升 Max。不要一開始就跳 Max。
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="pr-2">
+    <div class="step-num"><span>2</span></div>
+    <div class="step-body">
+      <h3>怎麼付費</h3>
+      <p>裝好 app 登入後，點左下角頭像 → Settings → Plans，就有訂閱按鈕。也可以先到 <span class="url">claude.com/pricing</span> 看完整方案。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Download -->
+<section class="chapter" id="download">
+  <div class="chapter-tag">Step 3 / 10</div>
+  <h2>下載並安裝 Claude 桌面 app</h2>
+  <p class="chapter-intro">大概 5 分鐘可以完成。</p>
+
+  <div class="step" data-step="dl-1">
+    <div class="step-num"><span>1</span></div>
+    <div class="step-body">
+      <h3>打開 Safari 或 Chrome，前往官方下載頁</h3>
+      <p>輸入：<span class="url">claude.com/download</span> 然後按 Enter。</p>
+      <div class="box warn">
+        <div class="box-title">⚠️ 認明 claude.com</div>
+        現在網路上有很多假冒網站。<strong>只有 claude.com 是 Anthropic 官方的</strong>，看到 claude-ai.xxx、claude-app.xxx 那種都不要點。
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="dl-2">
+    <div class="step-num"><span>2</span></div>
+    <div class="step-body">
+      <h3>選擇對應的 Mac 版本</h3>
+      <p>網站會提供兩個 Mac 版本：</p>
+
+      <div style="display:flex; gap:14px; justify-content:center; padding:16px 0;">
+        <div style="border:2px solid var(--accent); padding:14px 18px; border-radius:10px; text-align:center; background:var(--accent-soft); min-width:140px;">
+          <div style="font-size:24px;">🍏</div>
+          <div style="font-weight:600; color:var(--accent-deep); margin-top:4px;">Apple Silicon</div>
+          <div style="font-size:11px; color:var(--ink-mute);">M1 / M2 / M3 / M4</div>
+        </div>
+        <div style="border:1px solid var(--line); padding:14px 18px; border-radius:10px; text-align:center; min-width:140px;">
+          <div style="font-size:24px;">🖥️</div>
+          <div style="font-weight:600; margin-top:4px;">Intel</div>
+          <div style="font-size:11px; color:var(--ink-mute);">較舊的 Mac</div>
+        </div>
+      </div>
+
+      <div class="box tip">
+        <div class="box-title">💡 怎麼知道我的 Mac 是哪一種？</div>
+        左上角 蘋果圖示 → 「關於這台 Mac」。看到 <strong>「晶片：Apple M1 / M2 / M3 / M4」</strong> 就選 Apple Silicon；看到 <strong>「處理器：Intel」</strong> 就選 Intel。2020 年後買的 Mac 幾乎都是 Apple Silicon。
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="dl-3">
+    <div class="step-num"><span>3</span></div>
+    <div class="step-body">
+      <h3>安裝：把 Claude 拖到 Applications</h3>
+      <p>下載後雙擊那個 <span class="url">Claude.dmg</span> 檔，跳出視窗後，把左邊的 Claude 圖示拖到右邊的 Applications 資料夾。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="dl-4">
+    <div class="step-num"><span>4</span></div>
+    <div class="step-body">
+      <h3>打開 Claude</h3>
+      <p>按 <span class="kbd">F4</span>（或四指張開）打開 Launchpad，找到 Claude 點一下。</p>
+      <div class="box warn">
+        <div class="box-title">⚠️ 第一次打開可能會跳警告</div>
+        Mac 第一次打開非 App Store 的程式會問「確定要開啟？」，按「打開」就好。如果完全打不開、被擋下來，到「系統設定 → 隱私權與安全性」捲到最下面，會看到「Claude 已被阻擋」，按「仍然打開」。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Login + 3 modes -->
+<section class="chapter" id="login">
+  <div class="chapter-tag">Step 4 / 10</div>
+  <h2>登入與認識三個模式</h2>
+  <p class="chapter-intro">登入後最重要的是分清楚 Chat、Cowork、Code 這三個模式的差別。</p>
+
+  <div class="step" data-step="lg-1">
+    <div class="step-num"><span>1</span></div>
+    <div class="step-body">
+      <h3>用 Google 登入最快</h3>
+      <p>第一次打開會跳登入畫面。如果你有 Gmail 直接點「Continue with Google」最方便，不用記新密碼。或用 Email 註冊也可以。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="lg-2">
+    <div class="step-num"><span>2</span></div>
+    <div class="step-body">
+      <h3>認識視窗最上方的三個模式</h3>
+      <p>登入後左上方會看到三個按鈕。這是整個 Claude 的核心觀念，分清楚就不會迷路：</p>
+
+      <div class="mac-window">
+        <div class="mac-titlebar">
+          <span class="mac-dot r"></span><span class="mac-dot y"></span><span class="mac-dot g"></span>
+          <span class="mac-titlebar-text">Claude</span>
+        </div>
+        <div class="mac-body" style="padding:24px;">
+          <div class="mode-tabs">
+            <span class="mode-tab">💬 Chat</span>
+            <span class="mode-tab highlight">⏵ Cowork</span>
+            <span class="mode-tab">&lt;/&gt; Code</span>
+          </div>
+          <div class="annot">↑ 點「Cowork」就是這個</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; font-size:13px;">
+        <div style="border:1px solid var(--line); border-radius:8px; padding:12px;">
+          <div style="font-weight:700; margin-bottom:4px;">💬 Chat</div>
+          <div style="color:var(--ink-soft); line-height:1.5;">純聊天。跟網頁版一樣，<strong>不會碰你電腦</strong>。</div>
+        </div>
+        <div style="border:2px solid var(--accent); border-radius:8px; padding:12px; background:var(--accent-soft);">
+          <div style="font-weight:700; margin-bottom:4px; color:var(--accent-deep);">⏵ Cowork</div>
+          <div style="color:var(--ink-soft); line-height:1.5;"><strong>我們要用的</strong>。能讀寫資料夾、做檔案。</div>
+        </div>
+        <div style="border:1px solid var(--line); border-radius:8px; padding:12px;">
+          <div style="font-weight:700; margin-bottom:4px;">&lt;/&gt; Code</div>
+          <div style="color:var(--ink-soft); line-height:1.5;">給工程師寫程式用，<strong>跳過這個</strong>。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="lg-3">
+    <div class="step-num"><span>3</span></div>
+    <div class="step-body">
+      <h3>點「Cowork」進入工作模式</h3>
+      <p>進入 Cowork 後，左邊會看到一排功能。先認識最重要的幾個就好：</p>
+
+      <div class="mac-window">
+        <div class="mac-titlebar">
+          <span class="mac-dot r"></span><span class="mac-dot y"></span><span class="mac-dot g"></span>
+          <span class="mac-titlebar-text">Claude — Cowork</span>
+        </div>
+        <div class="cw-mock">
+          <div class="cw-side">
+            <div class="cw-side-item" style="font-size:10px; padding:4px 6px;">
+              <span style="background:#2a2a2a; padding:2px 8px; border-radius:4px;">💬</span>
+              <span style="background:var(--d-accent); color:white; padding:2px 8px; border-radius:4px;">⏵ Cowork</span>
+              <span style="background:#2a2a2a; padding:2px 8px; border-radius:4px;">&lt;/&gt;</span>
+            </div>
+            <div class="cw-side-item" style="margin-top:10px;">＋ New task</div>
+            <div class="cw-side-item highlight">📁 Projects</div>
+            <div class="cw-side-item">🕒 Scheduled</div>
+            <div class="cw-side-item">✨ Live artifacts</div>
+            <div class="cw-side-item">📨 Dispatch</div>
+            <div class="cw-side-item">⚙️ Customize</div>
+            <div class="cw-side-section">Pinned</div>
+            <div class="cw-side-item">📁 我的工作區</div>
+            <div class="cw-side-section">Recents</div>
+            <div class="cw-side-item">最近的對話 1</div>
+            <div class="cw-side-item">最近的對話 2</div>
+          </div>
+          <div class="cw-main">
+            <div style="color:var(--d-text-mute); font-size:12px; padding:40px 0; text-align:center;">
+              點 + New task 就能開始<br/>跟 Claude 講話
+            </div>
+            <div>
+              <div class="cw-input-bar">
+                <span style="color:var(--d-text-mute);">+ </span>
+                <span class="cw-pill">Ask ▾</span>
+                <span style="flex:1; color:var(--d-text-mute);">Write a message...</span>
+                <span class="cw-pill">Opus 4.7</span>
+                <span class="cw-pill queue">↳ Queue</span>
+              </div>
+              <div class="annot" style="text-align:left;">↑ 輸入框：「+」加附件，「Opus 4.7」選模型，「Queue」送出</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box tip">
+        <div class="box-title">💡 為什麼按鈕叫 "Queue" 不叫 Send？</div>
+        因為 Cowork 的任務會「排隊執行」——你可以連續丟好幾個任務給它，它會排隊一個個做。所以送出按鈕是 Queue（排入隊列）。對你來說操作上跟 Send 一樣，按下去就好。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Project -->
+<section class="chapter" id="project">
+  <div class="chapter-tag">Step 5 / 10</div>
+  <h2>建立你的第一個 Project（最重要的觀念）</h2>
+  <p class="chapter-intro">Project 是 Cowork 組織工作的方式。一個 Project = 一個資料夾 + 它記得的所有過往對話跟檔案。</p>
+
+  <div class="step" data-step="pj-1">
+    <div class="step-num"><span>1</span></div>
+    <div class="step-body">
+      <h3>先在你的電腦建一個資料夾</h3>
+      <p>到桌面，按右鍵 → 「新增檔案夾」，命名為 <span class="url">我的工作區</span>（之後可以改）。這個資料夾就是 Claude <strong>唯一</strong>能讀寫的地方，外面的它都看不到。</p>
+      <div class="box good">
+        <div class="box-title">✅ 為什麼不選整個 Documents？</div>
+        三個原因：(1) <strong>安全</strong> — 限縮她能碰到的範圍。(2) <strong>專注</strong> — 她不會被一堆無關檔案搞混。(3) <strong>整潔</strong> — 你電腦原本的東西不會跟 AI 工作的成品混在一起。
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="pj-2">
+    <div class="step-num"><span>2</span></div>
+    <div class="step-body">
+      <h3>在 Cowork 左邊欄點「Projects」→ 新增 Project</h3>
+      <p>會跳出一個視窗請你：</p>
+      <ol style="color:var(--ink-soft); padding-left:20px;">
+        <li>取一個名字（例如「我的工作區」）</li>
+        <li>選擇這個 Project 對應的資料夾（剛剛在桌面建的那個）</li>
+        <li>（可選）寫一段描述，告訴 Claude 這個 Project 是做什麼用的</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="step" data-step="pj-3">
+    <div class="step-num"><span>3</span></div>
+    <div class="step-body">
+      <h3>Mac 會跳出權限視窗，按「允許」</h3>
+      <p>Mac 系統會問「Claude 想存取『我的工作區』資料夾」，按 <strong>允許</strong>。這是 Mac 的安全機制，你之後也可以隨時收回（系統設定 → 隱私權與安全性 → 檔案與資料夾）。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="pj-4">
+    <div class="step-num"><span>4</span></div>
+    <div class="step-body">
+      <h3>恭喜，Project 建好了 🎉</h3>
+      <p>從現在開始，當你在這個 Project 裡點「+ New task」開新任務，Claude 都會自動知道：</p>
+      <ul style="color:var(--ink-soft);">
+        <li>她可以讀寫哪個資料夾</li>
+        <li>這個 Project 過去的對話歷史</li>
+        <li>你之前告訴她的習慣跟偏好</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="box tip">
+    <div class="box-title">💡 可以建很多 Project</div>
+    建議按用途分：例如「事業資料庫」「家庭事務」「旅遊規劃」「投資研究」各自一個 Project。彼此獨立、資料不會跑進別的 Project，找東西也快。
+  </div>
+</section>
+
+<!-- 6. First task -->
+<section class="chapter" id="first-task">
+  <div class="chapter-tag">Step 6 / 10</div>
+  <h2>第一個任務：做一份購物清單</h2>
+  <p class="chapter-intro">跟著做一次，就會了。</p>
+
+  <div class="step" data-step="ft-1">
+    <div class="step-num"><span>1</span></div>
+    <div class="step-body">
+      <h3>進入剛才建的 Project</h3>
+      <p>左邊欄點你的「我的工作區」Project。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="ft-2">
+    <div class="step-num"><span>2</span></div>
+    <div class="step-body">
+      <h3>點「+ New task」</h3>
+      <p>左上方會有這個按鈕。點下去會開新的對話視窗。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="ft-3">
+    <div class="step-num"><span>3</span></div>
+    <div class="step-body">
+      <h3>把這段話貼進輸入框，按 Queue</h3>
+      <div class="box good">
+        <div class="box-title">📋 貼這段給 Claude</div>
+        幫我做一份這週的買菜清單，分成「蔬菜」「肉類」「水果」「日用品」四類，每類列 5 樣常見的東西，存成一個 Excel 檔在這個 Project 的資料夾裡。
+      </div>
+      <p>然後點右下的 <strong>Queue</strong> 按鈕（或按 Enter）送出。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="ft-4">
+    <div class="step-num"><span>4</span></div>
+    <div class="step-body">
+      <h3>看著 Claude 工作</h3>
+      <p>她會開始一邊講話一邊操作。中間可能會問你「要不要繼續」或請你授權某個 app，按「<strong>允許 / 確認</strong>」就好。整個過程大概 30 秒到 1 分鐘。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="ft-5">
+    <div class="step-num"><span>5</span></div>
+    <div class="step-body">
+      <h3>打開檔案看成果</h3>
+      <p>完成後她會在對話裡放一個藍色連結，點下去直接開檔。或者到桌面「我的工作區」資料夾，會看到一個 .xlsx 檔。</p>
+      <div class="box good">
+        <div class="box-title">🎉 恭喜，你已經會用 Cowork 了</div>
+        其它所有功能都是這個模式：「進 Project → 開 New task → 講你要什麼 → Queue → 在資料夾看到成果」。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Connectors -->
+<section class="chapter" id="connectors">
+  <div class="chapter-tag">Step 7 / 10</div>
+  <h2>連接 Gmail、Google 日曆等工具</h2>
+  <p class="chapter-intro">Cowork 可以接你的 Gmail、Google 日曆、Google Drive、Notion、Slack 等服務。連好之後她就能直接幫你看信、訂會議、找雲端文件，不用你複製貼上。</p>
+
+  <div class="step" data-step="cn-1">
+    <div class="step-num"><span>1</span></div>
+    <div class="step-body">
+      <h3>什麼是 Connector？</h3>
+      <p>Connector = 把外部服務（Gmail、日曆等）「插上」Claude。連一次就好，之後她隨時可以幫你操作那個服務。</p>
+      <p>每個 Connector 都需要你親自登入 + 授權那個服務。授權的範圍由你決定，隨時可以收回。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="cn-2">
+    <div class="step-num"><span>2</span></div>
+    <div class="step-body">
+      <h3>怎麼連？點左邊欄的 Customize</h3>
+      <p>左邊欄有一個 <strong>⚙️ Customize</strong>（或叫 Settings → Connectors）的按鈕。點下去會看到一整排可連接的服務列表。</p>
+      <p>找到你想連的服務（例如 Gmail），點旁邊的 <strong>Connect</strong>。瀏覽器會自動打開，請你登入 Google 帳號 → 同意授權 → 自動跳回 Claude。</p>
+      <div class="box warn">
+        <div class="box-title">⚠️ 授權頁面要看清楚</div>
+        Google 會顯示「Claude 想要存取以下權限：讀取 Gmail / 寄件 / 修改⋯⋯」。看完再按同意。如果有覺得不需要的權限可以取消，但有些功能就會用不了。
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="cn-3">
+    <div class="step-num"><span>3</span></div>
+    <div class="step-body">
+      <h3>建議優先連這幾個</h3>
+      <p>你不用一次全連，先連最常用的兩個（Gmail + Calendar）就會差很多：</p>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:14px 0;">
+        <div style="border:2px solid var(--accent); border-radius:10px; padding:14px; background:var(--accent-soft);">
+          <div style="font-weight:700; margin-bottom:4px;">📧 Gmail <span style="font-size:11px; color:var(--accent-deep);">最推薦</span></div>
+          <div style="font-size:13px; color:var(--ink-soft);">看信、找信、寫草稿、整理收件匣、把附件存到 Project</div>
+        </div>
+        <div style="border:2px solid var(--accent); border-radius:10px; padding:14px; background:var(--accent-soft);">
+          <div style="font-weight:700; margin-bottom:4px;">📅 Google Calendar <span style="font-size:11px; color:var(--accent-deep);">最推薦</span></div>
+          <div style="font-size:13px; color:var(--ink-soft);">看行事曆、訂會議、找空檔、生成會議準備包</div>
+        </div>
+        <div style="border:1px solid var(--line); border-radius:10px; padding:14px;">
+          <div style="font-weight:700; margin-bottom:4px;">📁 Google Drive</div>
+          <div style="font-size:13px; color:var(--ink-soft);">讀雲端的 Doc / Sheet / Slide，搬到 Project</div>
+        </div>
+        <div style="border:1px solid var(--line); border-radius:10px; padding:14px;">
+          <div style="font-weight:700; margin-bottom:4px;">📝 Notion</div>
+          <div style="font-size:13px; color:var(--ink-soft);">如果你有用 Notion 管理資料／筆記</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="cn-4">
+    <div class="step-num"><span>4</span></div>
+    <div class="step-body">
+      <h3>連好之後可以叫她做這些事</h3>
+      <p>點任何一個展開看實際範例句：</p>
+
+      <details class="faq" style="margin-top:12px;">
+        <summary>📧 Gmail：自動處理供應商來信</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">幫我看一下這個禮拜有哪些供應商寄信來，列出寄件人、主旨、重點摘要。然後把報價單或合約類的附件下載到 <strong>03_供應商</strong> 資料夾，依供應商名稱建子資料夾。</p>
+      </details>
+
+      <details class="faq">
+        <summary>📅 Google Calendar：排會議跟提醒</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">幫我看一下下週的行事曆，找出有空的時段，安排一場 30 分鐘的客戶 call 在週二下午。把會議室訂下來，發邀請給 <strong>[客戶 email]</strong>。</p>
+      </details>
+
+      <details class="faq">
+        <summary>📧 + 📅 跨工具：開會前的準備包</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">明天上午 10 點我跟某客戶有會議。請從行事曆抓出會議細節，從 Gmail 找這個客戶過去三個月的所有往來信件，從 Project 資料夾抓出我們提過給他的提案，整理成一份「會議準備包」存到 <strong>04_客戶提案/{客戶名}</strong>。</p>
+      </details>
+
+      <details class="faq">
+        <summary>📧 Gmail：寫回覆草稿（不直接寄出）</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">幫我把收件匣裡這週還沒回覆的客戶來信整理出來，每一封幫我寫一份回覆草稿存到 Gmail 的「草稿匣」。語氣要客氣專業，重要的對方提問要明確回應。我之後會自己檢查跟寄出。</p>
+      </details>
+
+      <details class="faq">
+        <summary>📁 Google Drive：把雲端資料納入 Project</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">我 Google Drive 裡有個叫「市場研究」的資料夾，幫我把裡面的所有檔案讀一遍，整理出 5 個關鍵洞察，存到 Project 的 <strong>01_市場研究</strong> 資料夾裡。</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="step" data-step="cn-5">
+    <div class="step-num"><span>5</span></div>
+    <div class="step-body">
+      <h3>怎麼移除授權？</h3>
+      <p>有兩個地方可以收回，建議兩邊都做最乾淨：</p>
+      <ol style="color:var(--ink-soft); padding-left:20px;">
+        <li><strong>在 Claude 裡：</strong>Customize → Connectors → 找到那個服務 → Disconnect。</li>
+        <li><strong>在 Google 帳號設定：</strong>到 <span class="url">myaccount.google.com/permissions</span> → 找到 Claude → 移除存取權限。</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="box tip">
+    <div class="box-title">🔒 隱私重點</div>
+    Cowork 不會把你的信件、行事曆內容拿去訓練 AI。授權只是讓「這個 Claude 對話」可以幫你操作，跟你裝任何手機 app 給 Google 權限是一樣的概念。完整隱私政策在 <span class="url">anthropic.com/legal</span>。
+  </div>
+</section>
+
+<!-- 8. More demos -->
+<section class="chapter" id="more-demos">
+  <div class="chapter-tag">Step 8 / 10</div>
+  <h2>更多可以叫她做的事</h2>
+  <p class="chapter-intro">點任何一張卡片，會出現「可以怎麼跟 Claude 說」的範例句。直接複製貼上就能用。</p>
+
+  <div class="demos">
+    <div class="demo-card" onclick="this.classList.toggle('open')">
+      <div class="demo-icon">📧</div>
+      <h4>幫我寫一封 email</h4>
+      <p>請假信、感謝信、客訴信、英文 email⋯⋯都可以。</p>
+      <div class="demo-quote">幫我寫一封中文 email，跟同事說我下週一請假，請她幫我把午餐會議改到下週三同一時間。語氣客氣不囉嗦。</div>
+    </div>
+
+    <div class="demo-card" onclick="this.classList.toggle('open')">
+      <div class="demo-icon">🗂️</div>
+      <h4>整理桌面 / 資料夾</h4>
+      <p>把混亂的檔案分類、改名、搬到對的位置。</p>
+      <div class="demo-quote">這個 Project 資料夾裡有一堆 IMG_xxx 開頭的照片，幫我依照拍攝月份，分成不同的子資料夾整理好。</div>
+    </div>
+
+    <div class="demo-card" onclick="this.classList.toggle('open')">
+      <div class="demo-icon">📊</div>
+      <h4>做 Excel / 報表</h4>
+      <p>列清單、做預算表、追蹤運動紀錄、月支出統計。</p>
+      <div class="demo-quote">幫我做一個 12 個月的家庭收支記帳表，每個月有「收入、固定支出、變動支出、結餘」四欄，最下面自動加總。</div>
+    </div>
+
+    <div class="demo-card" onclick="this.classList.toggle('open')">
+      <div class="demo-icon">📄</div>
+      <h4>讀 PDF 並整理</h4>
+      <p>把一份長 PDF 變成重點摘要或一頁式總結。</p>
+      <div class="demo-quote">這份 PDF 是我女兒學校的活動通知，幫我整理出：日期、時間、地點、要帶什麼、要交多少錢，列成一個簡單的清單。</div>
+    </div>
+
+    <div class="demo-card" onclick="this.classList.toggle('open')">
+      <div class="demo-icon">🎨</div>
+      <h4>做一份簡報</h4>
+      <p>把一個主題變成 5–10 頁的 PPT。</p>
+      <div class="demo-quote">幫我做一份 8 頁的簡報，主題是「我家的義大利旅行回憶」，每頁一個城市，留空格讓我之後放照片。</div>
+    </div>
+
+    <div class="demo-card" onclick="this.classList.toggle('open')">
+      <div class="demo-icon">🌐</div>
+      <h4>幫我查資料</h4>
+      <p>查餐廳、比價、找旅遊資訊、整理網路文章。</p>
+      <div class="demo-quote">幫我查台北東區評價最好的 5 家義大利餐廳，比較它們的價位、招牌菜、營業時間，整理成一張表格。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. Personal database (special chapter) -->
+<section class="chapter" id="personal-db">
+  <div class="chapter-tag special">★ Step 9 / 10 — 專為你設計</div>
+  <h2>把 Cowork 當你的私人資料庫和提案產生器</h2>
+  <p class="chapter-intro">你說想把市場研究、品牌資料、供應商報價這些零散的東西丟給她，請她抓重點、整理脈絡、產出商業提案——當你的「圖書館」。下面是針對這個工作流設計的五個步驟。</p>
+
+  <div class="step" data-step="db-1">
+    <div class="step-num"><span>1</span></div>
+    <div class="step-body">
+      <h3>先設計一個資料夾結構（一次的事）</h3>
+      <p>有條理的資料夾 = Claude 能精準找到東西。在你的 Project 資料夾裡建這個結構：</p>
+
+<pre class="tree">事業資料庫/
+├─ 00_收件匣/         ← 還沒分類的東西先丟這
+├─ 01_市場研究/
+│   ├─ 產業趨勢/
+│   └─ 消費者洞察/
+├─ 02_品牌資料/
+│   ├─ 我的品牌/      ← logo、定位、tone of voice
+│   └─ 競品/
+├─ 03_供應商/
+│   └─ {供應商名}/    ← 報價單、聯絡資料、過往合作
+├─ 04_客戶提案/
+│   └─ {客戶名}/
+└─ 05_過往交付/       ← 完成的提案、報告</pre>
+
+      <div class="box tip">
+        <div class="box-title">💡 建議</div>
+        檔名加日期前綴（例如 <span class="url">2026-05_某品牌_市場報告.pdf</span>）會讓你之後問「上個月的某品牌資料」時超快找到。
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="db-2">
+    <div class="step-num"><span>2</span></div>
+    <div class="step-body">
+      <h3>在這個 Project 第一次對話時「教」Claude 認識你的事業</h3>
+      <p>把下面這段改成你的版本，貼進去她會永久記得（記在這個 Project 裡）：</p>
+      <div class="box good">
+        <div class="box-title">📋 自我介紹模板（改成你的）</div>
+        請永久記住下面這些事：<br/>
+        1. 我做的是 <strong>XXX 產業</strong>，主要產品/服務是 <strong>YYY</strong>。<br/>
+        2. 目標客群是 <strong>ZZZ</strong>。<br/>
+        3. 品牌調性是 <strong>OOO</strong>（例：精緻、親民、專業、玩味⋯⋯）。<br/>
+        4. 常見的客戶類型是 <strong>AAA</strong>。<br/>
+        5. 我提案的格式偏好是 <strong>BBB</strong>（例：簡報 8–10 頁、開頭先放 TL;DR、附一頁時程跟報價）。<br/>
+        以後幫我寫東西的時候，請預設套用這些設定，不要每次都問。
+      </div>
+      <p>這個動作做一次就好。在這個 Project 裡開新任務她也會記得。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="db-3">
+    <div class="step-num"><span>3</span></div>
+    <div class="step-body">
+      <h3>把資料丟進對應的子資料夾</h3>
+      <p>PDF、Word、PPT、Excel、甚至網頁截圖、會議錄音的逐字稿，都可以直接放。不用手動轉檔、不用先整理。雜亂沒關係，那就是 Claude 要幫你做的事。</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="db-4">
+    <div class="step-num"><span>4</span></div>
+    <div class="step-body">
+      <h3>五個你會用爆的指令</h3>
+      <p>點任何一個展開看詳細範例：</p>
+
+      <details class="faq" style="margin-top:12px;">
+        <summary>① 抓出脈絡：把多份資料的共通點找出來</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">把 <strong>01_市場研究</strong> 資料夾裡這個月新加的 5 份報告全部讀過，整理出：(1) 三份以上共同提到的趨勢 (2) 各自獨特的觀點 (3) 對我的品牌最相關的 3 個訊號。輸出一份 1 頁的對照摘要存到 <strong>05_過往交付</strong>。</p>
+      </details>
+
+      <details class="faq">
+        <summary>② 供應商比價：把報價單變成一張表</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">把 <strong>03_供應商</strong> 裡這次新收到的 4 家報價單，做成一張橫向比較表：欄位包含品項、單價、最低訂量、交期、付款條件、運費、備註。最後一欄給每家一個「綜合評分」跟你的推薦理由。存成 Excel。</p>
+      </details>
+
+      <details class="faq">
+        <summary>③ 競品 dossier：把零散資料變成一份完整檔</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">針對 <strong>02_品牌資料/競品/{某品牌名}</strong> 裡的所有資料，幫我整理出一份 dossier，包含：品牌定位、產品線與定價區間、主要通路、近期行銷活動、可觀察到的優勢與弱點、對我們的啟示。輸出 Word 檔，3–5 頁。</p>
+      </details>
+
+      <details class="faq">
+        <summary>④ 提案直出：用既有素材寫一份完整提案</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">根據 <strong>01_市場研究</strong> 和 <strong>02_品牌資料/我的品牌</strong> 裡的內容，幫我寫一份 8 頁簡報，給 <strong>[客戶名稱]</strong>。主軸是 <strong>[這次想推的賣點]</strong>，預算範圍 <strong>[XX 萬]</strong>。結構：問題 → 洞察 → 我們的解法 → 案例 → 時程 → 報價。完成後存到 <strong>04_客戶提案/{客戶名}/</strong>。</p>
+      </details>
+
+      <details class="faq">
+        <summary>⑤ 知識檢索：問她「我之前是不是看過 ⋯⋯」</summary>
+        <p style="font-style:italic; background:var(--good-soft); padding:10px 14px; border-radius:8px;">我記得我之前看過一份報告，講到 <strong>[關鍵字／某個主題]</strong>，但忘了在哪。幫我在整個 Project 資料夾裡找一下，列出所有相關的檔案、各自的重點、我可能想找的那段原文。</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="step" data-step="db-5">
+    <div class="step-num"><span>5</span></div>
+    <div class="step-body">
+      <h3>進階：讓她變成你的「每週習慣」（用 Scheduled）</h3>
+      <p>Cowork 有一個叫「Scheduled」的功能（左邊欄能看到）——可以設定固定時間自動執行的任務。你可以設定一個「每週一早上 9 點自動跑」的任務：</p>
+      <div class="box good">
+        <div class="box-title">🔁 設定每週 routine（貼這段給她，請她幫你建排程）</div>
+        幫我建立一個 Scheduled 任務，每週一早上 9 點自動執行，內容是：<br/>
+        1. 把 <strong>00_收件匣</strong> 裡的檔案分類到正確的子資料夾。<br/>
+        2. 產出一份「上週 digest」：3 個重點趨勢、最值得關注的供應商動態、最值得關注的競品動作。<br/>
+        3. 點出這些新資訊跟我目前手上提案（在 04_客戶提案 裡）有什麼關聯。<br/>
+        4. 把 digest 存到 <strong>05_過往交付/週報/{年月}.docx</strong>。<br/>
+        5. 完成後在 Claude 通知我。
+      </div>
+      <div class="box tip">
+        <div class="box-title">🧠 為什麼這個強</div>
+        這就是你說的「腦容量不夠」的解法——讓她當你的長期記憶 + 索引系統。她不會忘、不會漏、能跨檔案串連，而且每次都用你預設的格式產出。每週一打開電腦，digest 已經做好了。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. FAQ -->
+<section class="chapter" id="faq">
+  <div class="chapter-tag">Step 10 / 10</div>
+  <h2>常見問題</h2>
+  <p class="chapter-intro">EE問過或可能會問的問題，先列在這。</p>
+
+  <details class="faq">
+    <summary>它真的會看我電腦裡所有東西嗎？會不會不安全？</summary>
+    <p>不會。每個 Project 只能看你親自指定給它的那個資料夾，<strong>外面的東西它讀不到也寫不到</strong>。Mac 第一次也會再問一次「要不要允許？」，是雙重把關。想停止隨時可以刪除 Project，或在 Mac「系統設定 → 隱私權與安全性 → 檔案與資料夾」收回權限。</p>
+  </details>
+
+  <details class="faq">
+    <summary>免費帳號可以用 Cowork 嗎？</summary>
+    <p>不行。Cowork 是 Pro / Max / Team 才能用。免費帳號只能用一般 Chat（純聊天）。建議先選 Pro $20/月，對你描述的用途（資料整理、寫提案、當資料庫）非常夠用。</p>
+  </details>
+
+  <details class="faq">
+    <summary>它會記得我之前說過的事嗎？</summary>
+    <p>同一個 Project 裡會記得（這就是 Project 的好處——它有記憶）。你跟它說「請永久記住⋯⋯」這類話，她會把這件事存到那個 Project 的記憶裡，新的 task 也會知道。但跨 Project 不會共享記憶（避免資料混淆）。</p>
+  </details>
+
+  <details class="faq">
+    <summary>Scheduled 任務怎麼用？</summary>
+    <p>左邊欄有「Scheduled」按鈕，可以看到所有排程任務。你不用自己學設定——直接跟 Claude 說「幫我建一個每週一早上 9 點的排程，做某某事」，她會幫你建好。建好之後你可以隨時編輯或關掉。</p>
+  </details>
+
+  <details class="faq">
+    <summary>它會不會不小心刪掉我的檔案？</summary>
+    <p>她要刪檔案前通常會先問你「確定要刪嗎？」並列出要刪的清單。最保險的做法是：第一個月先讓她在 Project 資料夾裡工作，重要的檔案先放外面、不要放進去；等熟悉之後再開放更大範圍。</p>
+  </details>
+
+  <details class="faq">
+    <summary>說錯話、想叫它停下來怎麼辦？</summary>
+    <p>輸入框旁邊會有一個停止按鈕（紅色方框），按下去她就會停。或直接打「停一下，我想改一下需求」她也會停下聽你說。</p>
+  </details>
+
+  <details class="faq">
+    <summary>Opus / Sonnet / Haiku 三個模型差在哪？要選哪個？</summary>
+    <p>輸入框右下會有模型選擇。簡單記：<strong>Opus = 最聰明但慢、最貴額度</strong>（適合寫提案、深度分析）；<strong>Sonnet = 平衡</strong>（日常用這個）；<strong>Haiku = 最快但最簡單</strong>（適合快速問答）。預設用 Sonnet 或 Opus 就好，Haiku 比較少用。</p>
+  </details>
+
+  <details class="faq">
+    <summary>有問題卡住怎麼辦？</summary>
+    <p>最簡單的方法：<strong>直接在對話框裡問 Claude</strong>。例如打「我不知道怎麼建 Project」、「我找不到下載的檔案」，她會用中文一步一步教你。她真的就是你的助理，問她沒關係。</p>
+  </details>
+</section>
+
+<div class="footer">
+  歡迎你進來這個世界 <span class="heart">♥</span><br/>
+  有任何問題隨時問 Gunter，或直接問 Claude。
+</div>
+
+</main>
+</div>
+
+<script>
+  const STORAGE_KEY = 'cowork-guide-progress-v2';
+  let progress = {};
+  try {
+    progress = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch (e) { progress = {}; }
+
+  document.querySelectorAll('.step').forEach(step => {
+    const id = step.dataset.step;
+    if (progress[id]) step.classList.add('checked');
+    step.querySelector('.step-num').addEventListener('click', () => {
+      step.classList.toggle('checked');
+      progress[id] = step.classList.contains('checked');
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      updateProgress();
+    });
+  });
+
+  function updateProgress() {
+    const steps = document.querySelectorAll('.step');
+    const total = steps.length;
+    const done = document.querySelectorAll('.step.checked').length;
+    const pct = total === 0 ? 0 : Math.round(done / total * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    document.querySelectorAll('section.chapter').forEach((sec, idx) => {
+      const sectionSteps = sec.querySelectorAll('.step');
+      const sectionDone = sec.querySelectorAll('.step.checked');
+      const navItem = document.querySelectorAll('#nav-list a')[idx];
+      if (!navItem) return;
+      if (sectionSteps.length > 0 && sectionDone.length === sectionSteps.length) {
+        navItem.classList.add('done');
+      } else {
+        navItem.classList.remove('done');
+      }
+    });
+  }
+
+  function resetProgress() {
+    if (!confirm('確定要重設所有進度嗎？')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    progress = {};
+    document.querySelectorAll('.step.checked').forEach(s => s.classList.remove('checked'));
+    document.querySelectorAll('#nav-list a.done').forEach(a => a.classList.remove('done'));
+    updateProgress();
+  }
+
+  updateProgress();
+</script>
+
+</body>
+</html>
